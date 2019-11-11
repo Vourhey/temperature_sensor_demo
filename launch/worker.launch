@@ -1,3 +1,9 @@
 <launch>
-  <node name="worker" pkg="autonomous_agent_template" type="worker_node" output="screen" />
+    <arg name="account" default="" />
+    <arg name="lighthouse" default="0xD40AC7F1e5401e03D00F5aeC1779D8e5Af4CF9f1" />
+    <node name="worker" pkg="temperature_sensor_demo" type="worker_node" output="screen">
+        <param name="lighthouse" value="$(arg lighthouse)" />
+        <param name="account" value="$(arg account)" />
+        <param name="model" value="QmTgEAeKDiuQintyAZDLqimnwDg278TpYgXjE6CBBeAtnG" />
+    </node>
 </launch>

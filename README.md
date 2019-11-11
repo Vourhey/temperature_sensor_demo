@@ -169,52 +169,28 @@ root@aira-rpi4> ls /sys/bus/w1/devices/                                       ~
 28-01162784ddee  w1_bus_master1
 ```
 
+## 10 Building and launching the agent
 
-Для получения данных с сенсора создадим скрипт `temp.py` :  
+### Build
 
-    import glob  
-    import time  
-       
-    base_dir = '/sys/bus/w1/devices/'  
-    device_folder = glob.glob(base_dir + '28*')[0]  
-    device_file = device_folder + '/w1_slave'  
-      
-    def read_temp_raw():  
-    f = open(device_file, 'r')  
-    lines = f.readlines()  
-    f.close()  
-    return lines  
-       
-    def read_temp():  
-        lines = read_temp_raw()  
-        while lines[0].strip()[-3:] != 'YES':  
-            time.sleep(0.2)  
-            lines = read_temp_raw()  
-        equals_pos = lines[1].find('t=')  
-        if equals_pos != -1:  
-            temp_string = lines[1][equals_pos+2:]  
-            temp_c = float(temp_string) / 1000.0  
-            temp_f = temp_c * 9.0 / 5.0 + 32.0  
-            return temp_c, '°C', temp_f, '°F'  
-        
-    while True:    
-            print(read_temp())  
-        time.sleep(1)`    
-        
-или скачаем его:  
+Clone the repository and build the package
 
-    wget https://gist.githubusercontent.com/PavelSheremetev/ccdd1869db2a8ebca9036d3be8111291/raw/7319e83f48e85731af27d9496e48f20f5e4afdee/temp.py  
-    
-Запустим наш скрипт:  
+```
+git clone https://github.com/Vourhey/temperature_sensor_demo
+cd temperature_sensor_demo
+nix build -f release.nix
+```
 
-    python temp.py  
-и если все сделанно правильно мы увидем:  
+### Launch
 
-    root@aira-rpi4> python temp.py   
-    (21.812, '°C', 71.2616, '°F')  
-    (21.812, '°C', 71.2616, '°F')  
-    (21.812, '°C', 71.2616, '°F')  
-    (21.875, '°C', 71.375, '°F')  
-    (21.875, '°C', 71.375, '°F')  
-    (21.875, '°C', 71.375, '°F')  
-    (21.875, '°C', 71.375, '°F')  
+```
+soure result/setub.zsh
+roslaunch temperature_sensor_demo worker.launch account:=<YOUR_ETH_ACCOUNT> [no_sensor:=true] 
+```
+
+where `<YOUR_ETH_ACCOUNT>` is an account you send a demand message from. To find out the address go to the [Dapp](https://ipfs.ipci.io/ipfs/QmeFBfx4K1Ah5nW4uvHGg7jSUkytmLdFGgFJfSZrvpvMY8/)
+
+> [MetaMask](https://metamask.io/) extension is required
+
+`no_sensor` - is for debug purpose
+

@@ -18,8 +18,6 @@ from robonomics_msgs.msg import Demand, Result
 from ipfs_common.msg import Multihash
 from ipfsapi import connect
 
-NO_SENSOR = True
-
 class WorkerNode:
     def __init__(self):
         rospy.init_node('worker')
@@ -28,6 +26,8 @@ class WorkerNode:
         rospy.Subscriber('/liability/infochan/incoming/demand', Demand, self.on_incoming_demand)
 
         self.result_publish = rospy.Publisher('/liability/infochan/eth/signing/result', Result, queue_size=128)
+
+        self.NO_SENSOR = True if rospy.get_param("~no_sensor") == "true" else False
 
         rospy.loginfo('Worker node launched.')
 
@@ -41,14 +41,16 @@ class WorkerNode:
         ipfsclient = connect()
 
         temp_log = NamedTemporaryFile(delete=False)
+        bag = Bag(temp_log.name, 'w')
 
-        if NO_SENSOR:
-            bag = Bag(temp_log.name, 'w')
+        if self.NO_SENSOR:
 
             res_str = {
                 'temp_c': 21.0,
                 'temp_f': 69.8
             }
+            rospy.loginfo("Current temerature is {}".format(res_str))
+
             bag.write('/data', String(json.dumps(res_str)))
             bag.close()
             res_hash = ipfsclient.add(temp_log.name)
@@ -74,12 +76,18 @@ class WorkerNode:
             temp_c = float(temp_string) / 1000.0
             temp_f = temp_c * 9.0 / 5.0 + 32.0
 
-            res_str = "{} °C', {} °F".format(temp_c, temp_f)
+            res_str = {
+                'temp_c': temp_c,
+                'temp_f': temp_f
+            }
             rospy.loginfo("Current temerature is {}".format(res_str))
-            return Multihash(ipfsclient.add_str(res_str))
+
+            bag.write('/data', String(json.dumps(res_str)))
+            bag.close()
+            res_hash = ipfsclient.add(temp_log.name)
+            return Multihash(res_hash['Hash'])
 
         return Multihash("")
-
 
     def send_result(self, msg: Demand):
         rospy.loginfo('Starting process...')

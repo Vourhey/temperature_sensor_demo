@@ -1,6 +1,8 @@
 Temperature Sensor Demo
 -----------------------
 
+The most of the following instructions are provided by @PavelSheremetev
+
 # Burn an image to an SD card
 ## 1 Download the latest image of Aira for Raspberry Pi 4
 

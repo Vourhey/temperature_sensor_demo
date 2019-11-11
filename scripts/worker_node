@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Standard
+import glob
+import time
+import json
+from tempfile import NamedTemporaryFile
+
 # ROS
 import rospy
+from rosbag import Bag
 from std_msgs.msg import String
 from std_srvs.srv import Empty
 
 # AIRA
 from robonomics_msgs.msg import Demand, Result
-from ethereum_common.msg import Address, UInt256
-from ethereum_common.srv import Accounts, BlockNumber
 from ipfs_common.msg import Multihash
+from ipfsapi import connect
 
+NO_SENSOR = True
 
 class WorkerNode:
     def __init__(self):
@@ -30,7 +37,48 @@ class WorkerNode:
             self.send_result(msg)
 
     def get_temperature(self) -> Multihash:
+        rospy.loginfo("Getting the temerature...")
         ipfsclient = connect()
+
+        temp_log = NamedTemporaryFile(delete=False)
+
+        if NO_SENSOR:
+            bag = Bag(temp_log.name, 'w')
+
+            res_str = {
+                'temp_c': 21.0,
+                'temp_f': 69.8
+            }
+            bag.write('/data', String(json.dumps(res_str)))
+            bag.close()
+            res_hash = ipfsclient.add(temp_log.name)
+            return Multihash(res_hash['Hash'])
+
+        base_dir = '/sys/bus/w1/devices/'
+        device_folder = glob.glob(base_dir + '28*')[0]
+        device_file = device_folder + '/w1_slave'
+
+        def read_temp_raw():
+            f = open(device_file, 'r')
+            lines = f.readlines()
+            f.close()
+            return lines
+
+        lines = read_temp_raw()
+        while lines[0].strip()[-3:] != 'YES':
+            time.sleep(0.2)
+            lines = read_temp_raw()
+        equals_pos = lines[1].find('t=')
+        if equals_pos != -1:
+            temp_string = lines[1][equals_pos+2:]
+            temp_c = float(temp_string) / 1000.0
+            temp_f = temp_c * 9.0 / 5.0 + 32.0
+
+            res_str = "{} °C', {} °F".format(temp_c, temp_f)
+            rospy.loginfo("Current temerature is {}".format(res_str))
+            return Multihash(ipfsclient.add_str(res_str))
+
+        return Multihash("")
 
 
     def send_result(self, msg: Demand):
@@ -38,8 +86,10 @@ class WorkerNode:
 
         res = Result()
         res.liability = msg.sender
-        res.result = "" # TODO temperature
+        res.result = self.get_temperature()
         res.success = True
+
+        rospy.loginfo(res)
 
         self.result_publish.publish(res)
 

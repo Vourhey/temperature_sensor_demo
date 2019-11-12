@@ -27,7 +27,8 @@ class WorkerNode:
 
         self.result_publish = rospy.Publisher('/liability/infochan/eth/signing/result', Result, queue_size=128)
 
-        self.NO_SENSOR = True if rospy.get_param("~no_sensor") == "true" else False
+        self.NO_SENSOR = bool(rospy.get_param("~no_sensor"))
+        rospy.loginfo("No sensor: {}".format(self.NO_SENSOR))
 
         rospy.loginfo('Worker node launched.')
 

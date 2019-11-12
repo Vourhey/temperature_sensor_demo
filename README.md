@@ -186,7 +186,7 @@ nix build -f release.nix
 ### Launch
 
 ```
-soure result/setub.zsh
+soure result/setup.zsh
 roslaunch temperature_sensor_demo worker.launch account:=<YOUR_ETH_ACCOUNT> [no_sensor:=true] 
 ```
 

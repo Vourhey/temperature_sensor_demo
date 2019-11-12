@@ -1,6 +1,7 @@
 { stdenv
 , mkRosPackage
 , robonomics_comm
+, pkgs
 }:
 
 mkRosPackage rec {
@@ -10,7 +11,7 @@ mkRosPackage rec {
 
   src = ./.;
 
-  propagatedBuildInputs = [ robonomics_comm ];
+  propagatedBuildInputs = [ robonomics_comm pkgs.python37Packages.ipfsapi ];
 
   meta = with stdenv.lib; {
     description = "Temperature Sensor Demo";

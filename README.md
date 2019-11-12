@@ -190,7 +190,7 @@ soure result/setup.zsh
 roslaunch temperature_sensor_demo worker.launch account:=<YOUR_ETH_ACCOUNT> [no_sensor:=true] 
 ```
 
-where `<YOUR_ETH_ACCOUNT>` is an account you send a demand message from. To find out the address go to the [Dapp](https://ipfs.ipci.io/ipfs/QmeFBfx4K1Ah5nW4uvHGg7jSUkytmLdFGgFJfSZrvpvMY8/)
+where `<YOUR_ETH_ACCOUNT>` is an account you send a demand message from. To find out the address go to the [Dapp](https://ipfs.ipci.io/ipfs/QmZp1hMMLnfr3g2Liqg3wFqiRQ1fGDtwa7CDPxxDzHvZWo/#/)
 
 > [MetaMask](https://metamask.io/) extension is required
 

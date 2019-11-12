@@ -58,7 +58,7 @@ sync
 # Connect to network
 
 ## 5.1 LAN
-See #6
+See (#6-Switch-to-unstable-channel-and-update-channel-cache)
 
 ## 5.2 WiFi
 

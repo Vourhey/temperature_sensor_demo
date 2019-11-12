@@ -1,6 +1,6 @@
 <launch>
     <arg name="account" default="0x4DaD5644975f574eB32EE38d311CFc8518f1e0F0" />
-    <arg name="lighthouse" default="0x2442ED30381f8556e1e2C12fdb0E7F0aa56192E9" />
+    <arg name="lighthouse" default="0xD40AC7F1e5401e03D00F5aeC1779D8e5Af4CF9f1" />
     <arg name="no_sensor" default="false" />
     <node name="worker" pkg="temperature_sensor_demo" type="worker_node" output="screen">
         <param name="lighthouse" value="$(arg lighthouse)" />

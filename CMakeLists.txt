@@ -12,13 +12,14 @@ catkin_package()
 catkin_install_python(
     PROGRAMS
         scripts/worker_node
+		scripts/trader_node
     DESTINATION
         ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(
     FILES
-        launch/worker.launch
+        launch/agent.launch
     DESTINATION
         ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )

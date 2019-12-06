@@ -1,0 +1,15 @@
+<launch>
+    <arg name="account" default="0x4DaD5644975f574eB32EE38d311CFc8518f1e0F0" />
+    <arg name="model" default="Qmd6bn2JGW26hSx7g5gVCmfgB7uigRPrhAukJn77ee3bMM" />
+    <arg name="no_sensor" default="false" />
+    <node name="trader" pkg="temperature_sensor_demo" type="trader_node" output="screen" respawn="true">
+        <param name="service_model" value="QmeW4LMpuaAMuvNAbLHKN64EY3p3pWNzahhzKB8UCfdkfw" />
+        <param name="model" value="$(arg model)" />
+        <param name="objective" value="QmVAFgUxBitKqtV2sjaYcHkKfcAPVy3GswhaE5n5bcgLkf" />
+    </node>
+    <node name="worker" pkg="temperature_sensor_demo" type="worker_node" output="screen" respawn="true">
+        <param name="account" value="$(arg account)" />
+        <param name="model" value="$(arg model)" />
+        <param name="no_sensor" value="$(arg no_sensor)" />
+    </node>
+</launch>

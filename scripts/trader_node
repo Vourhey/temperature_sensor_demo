@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Standart, System and Third Party
+import os
+
+# ROS
+import rospy
+
+# Robonomics communication
+from robonomics_msgs.msg import Offer, Demand
+from ethereum_common.msg import Address, UInt256
+from ethereum_common.srv import Accounts
+from ipfs_common.msg import Multihash
+
+
+class TraderNode:
+
+    def __init__(self):
+        rospy.init_node('trader')
+        rospy.loginfo('Launching trader node...')
+
+        rospy.wait_for_service('/eth/accounts')
+        self.accounts = rospy.ServiceProxy('/eth/accounts', Accounts)()
+        rospy.loginfo(str(self.accounts))  # AIRA ethereum addresses
+
+        self.signing_offer = rospy.Publisher('/liability/infochan/eth/signing/offer', Offer, queue_size=128)
+
+        rospy.Subscriber('/liability/infochan/incoming/demand', Demand, self.on_incoming_demand)
+
+        self.MODEL = rospy.get_param("~model")
+
+        rospy.loginfo('Trader node is launched')
+
+    def on_incoming_demand(self, incoming: Demand):
+        rospy.loginfo('Incoming demand %s...', str(incoming))
+        if incoming.model.multihash == rospy.get_param("~service_model"):
+            self.make_service_offer(incoming)
+        else:
+            rospy.loginfo("Doesn't fit my model or token, skip it")
+
+    def make_service_offer(self, incoming: Demand):
+        """
+        The offer is not meant to be executed, rather it tells what this particular agent is able to do
+        """
+        rospy.loginfo("Making service offer...")
+
+        offer = Offer()
+        offer.model = Multihash(rospy.get_param("~model"))
+        offer.objective = Multihash(rospy.get_param("~objective"))
+        offer.token = incoming.token
+        offer.cost = UInt256("0")
+        offer.lighthouse = incoming.lighthouse
+        offer.validator = Address("0x0000000000000000000000000000000000000000")
+        offer.lighthouseFee = UInt256("0")
+        offer.deadline = UInt256("0")    # Prevents of liability contract creation
+
+        rospy.loginfo(offer)
+        self.signing_offer.publish(offer)
+
+    def spin(self):
+        rospy.spin()
+
+
+if __name__ == '__main__':
+    TraderNode().spin()
+

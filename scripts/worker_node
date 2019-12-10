@@ -8,6 +8,7 @@ import rospy
 
 # AIRA
 from robonomics_msgs.msg import Demand, Result
+from temperature_sensor_demo.get_temperature import get_temperature
 
 class WorkerNode:
     def __init__(self):

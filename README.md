@@ -178,6 +178,7 @@ root@aira-rpi4> ls /sys/bus/w1/devices/                                       ~
 Clone the repository and build the package
 
 ```
+su liability && cd    # the agent must be run under liability user
 git clone https://github.com/Vourhey/temperature_sensor_demo
 cd temperature_sensor_demo
 nix build -f release.nix
@@ -186,7 +187,7 @@ nix build -f release.nix
 ### Launch
 
 ```
-source result/setup.zsh
+source result/setup.bash
 roslaunch temperature_sensor_demo agent.launch account:=<YOUR_ETH_ACCOUNT> [no_sensor:=true] 
 ```
 
